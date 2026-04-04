@@ -2,19 +2,19 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 let stompClient = null;
-let messageCallback = null; // ✅ callback ref — reconnect pe bhi kaam kare
+let messageCallback = null;
 
 const getToken = () => localStorage.getItem("token") || "";
 
 export const connectSocket = (onMessageReceived) => {
-  // ✅ Callback hamesha update karo
   messageCallback = onMessageReceived;
 
-  // Pehle se connected hai toh sirf callback update karo
   if (stompClient && stompClient.active) return;
 
   stompClient = new Client({
-    webSocketFactory: () => new SockJS("http://localhost:8081/ws"),
+    // ✅ FIXED URL (HTTPS)
+    webSocketFactory: () =>
+      new SockJS("https://job-portal-backend-2-ictb.onrender.com/ws"),
 
     connectHeaders: {
       Authorization: `Bearer ${getToken()}`,
@@ -25,7 +25,6 @@ export const connectSocket = (onMessageReceived) => {
 
       stompClient.subscribe("/user/queue/messages", (msg) => {
         try {
-          // ✅ Latest callback use karo — closure problem fix
           if (messageCallback) {
             messageCallback(JSON.parse(msg.body));
           }
