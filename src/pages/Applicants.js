@@ -11,6 +11,7 @@ function Applicants() {
 
   useEffect(() => {
     fetchApplicants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchApplicants = async () => {
@@ -18,7 +19,9 @@ function Applicants() {
       setLoading(true);
       const res = await API.get(`/applications/job/${id}`);
       setApps(res.data);
-      if (res.data.length > 0) setJobTitle(res.data[0]?.job?.title || "");
+      if (res.data.length > 0) {
+        setJobTitle(res.data[0]?.job?.title || "");
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -27,7 +30,11 @@ function Applicants() {
   };
 
   const viewResume = (userId) => {
-    window.open(`http://localhost:8081/resume/view/${userId}`, "_blank");
+    // ⚠️ Production fix (localhost → deployed backend)
+    window.open(
+      `https://job-portal-backend-2-ictb.onrender.com/resume/view/${userId}`,
+      "_blank"
+    );
   };
 
   const updateStatus = async (appId, status) => {
@@ -40,8 +47,6 @@ function Applicants() {
     }
   };
 
-  // ✅ FIX: Contact object ke saath /chat pe navigate karo
-  // Chat.js mein useEffect lagega jo is contact ko auto-select karega
   const messageApplicant = (jobSeeker) => {
     navigate("/chat", {
       state: {
@@ -56,10 +61,14 @@ function Applicants() {
 
   const statusColor = (status) => {
     switch (status) {
-      case "SHORTLISTED": return "text-yellow-400";
-      case "HIRED":       return "text-green-400";
-      case "REJECTED":    return "text-red-400";
-      default:            return "text-[#7A8899]";
+      case "SHORTLISTED":
+        return "text-yellow-400";
+      case "HIRED":
+        return "text-green-400";
+      case "REJECTED":
+        return "text-red-400";
+      default:
+        return "text-[#7A8899]";
     }
   };
 
@@ -75,20 +84,34 @@ function Applicants() {
           ← Back
         </button>
         <div>
-          <h2 className="text-3xl font-bold text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Applicants {jobTitle && <span className="text-[#C9963A]">— {jobTitle}</span>}
+          <h2
+            className="text-3xl font-bold text-white mb-1"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            Applicants{" "}
+            {jobTitle && (
+              <span className="text-[#C9963A]">— {jobTitle}</span>
+            )}
           </h2>
-          <p className="text-[#7A8899] text-sm">Review and manage applications for this job</p>
+          <p className="text-[#7A8899] text-sm">
+            Review and manage applications for this job
+          </p>
         </div>
       </div>
 
-      {loading && <p className="text-[#7A8899] text-sm">Loading applicants…</p>}
+      {loading && (
+        <p className="text-[#7A8899] text-sm">Loading applicants…</p>
+      )}
 
       {!loading && apps.length === 0 && (
         <div className="text-center py-20 bg-[#112033] border border-[#1E2E42] rounded-xl">
           <p className="text-4xl mb-3">👥</p>
-          <p className="text-white font-semibold mb-1">No applications yet</p>
-          <p className="text-[#7A8899] text-sm">No one has applied to this job yet.</p>
+          <p className="text-white font-semibold mb-1">
+            No applications yet
+          </p>
+          <p className="text-[#7A8899] text-sm">
+            No one has applied to this job yet.
+          </p>
         </div>
       )}
 
@@ -101,14 +124,21 @@ function Applicants() {
             <div className="flex flex-wrap justify-between items-start gap-4">
 
               <div>
-                <p className="font-semibold text-white mb-0.5">{app.jobSeeker?.name || "N/A"}</p>
-                <p className="text-[#7A8899] text-sm mb-1">{app.jobSeeker?.email}</p>
+                <p className="font-semibold text-white mb-0.5">
+                  {app.jobSeeker?.name || "N/A"}
+                </p>
+                <p className="text-[#7A8899] text-sm mb-1">
+                  {app.jobSeeker?.email}
+                </p>
                 <p className="text-sm">
                   Status:{" "}
-                  <span className={`font-semibold ${statusColor(app.status)}`}>
+                  <span
+                    className={`font-semibold ${statusColor(app.status)}`}
+                  >
                     {app.status}
                   </span>
                 </p>
+
                 {app.jobSeeker?.id && (
                   <button
                     onClick={() => viewResume(app.jobSeeker.id)}
@@ -120,25 +150,27 @@ function Applicants() {
               </div>
 
               <div className="flex gap-2 flex-wrap items-start">
-                {/* ✅ FIX: Ab seedha us applicant ki chat open hogi */}
                 <button
                   onClick={() => messageApplicant(app.jobSeeker)}
                   className="border border-[#1E88E5]/40 text-[#64B5F6] text-sm px-3 py-1.5 rounded-lg hover:bg-[#1E88E5]/10 transition-colors"
                 >
                   💬 Message
                 </button>
+
                 <button
                   onClick={() => updateStatus(app.id, "SHORTLISTED")}
                   className="border border-yellow-600/40 text-yellow-400 text-sm px-3 py-1.5 rounded-lg hover:bg-yellow-900/20 transition-colors"
                 >
                   Shortlist
                 </button>
+
                 <button
                   onClick={() => updateStatus(app.id, "HIRED")}
                   className="border border-green-700/40 text-green-400 text-sm px-3 py-1.5 rounded-lg hover:bg-green-900/20 transition-colors"
                 >
                   Hire
                 </button>
+
                 <button
                   onClick={() => updateStatus(app.id, "REJECTED")}
                   className="border border-red-700/40 text-red-400 text-sm px-3 py-1.5 rounded-lg hover:bg-red-900/20 transition-colors"

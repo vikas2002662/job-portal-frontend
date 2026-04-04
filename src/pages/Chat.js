@@ -38,17 +38,7 @@ function Bubble({ msg, isNew }) {
   );
 }
 
-function TypingDots() {
-  return (
-    <div className="flex justify-start mb-3 animate-fade-in">
-      <div className="bg-[#152840] border border-[#1E2E42] rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-        <span className="typing-dot w-1.5 h-1.5 rounded-full bg-[#C9963A]" style={{ animationDelay: "0ms" }} />
-        <span className="typing-dot w-1.5 h-1.5 rounded-full bg-[#C9963A]" style={{ animationDelay: "200ms" }} />
-        <span className="typing-dot w-1.5 h-1.5 rounded-full bg-[#C9963A]" style={{ animationDelay: "400ms" }} />
-      </div>
-    </div>
-  );
-}
+// ✅ REMOVED: TypingDots — typing state remove kar diya isliye yeh bhi hata diya
 
 function EmptyState({ text }) {
   return (
@@ -71,7 +61,7 @@ function Chat() {
   const [activeContact, setActiveContact]     = useState(null);
   const [input, setInput]                     = useState("");
   const [search, setSearch]                   = useState("");
-  const [typing, setTyping]                   = useState(false);
+  // ✅ REMOVED: const [typing, setTyping] = useState(false); — unused tha
   const [newMsgIds, setNewMsgIds]             = useState(new Set());
   const [mobileSidebar, setMobileSidebar]     = useState(true);
   const [unread, setUnread]                   = useState({});
@@ -79,9 +69,8 @@ function Chat() {
   const bottomRef        = useRef(null);
   const inputRef         = useRef(null);
   const activeContactRef = useRef(null);
-  const contactsRef      = useRef([]);  // ✅ contacts ka ref — closure fix
+  const contactsRef      = useRef([]);
 
-  // ✅ Refs hamesha updated rahein
   useEffect(() => {
     activeContactRef.current = activeContact;
   }, [activeContact]);
@@ -94,7 +83,6 @@ function Chat() {
   const filtered    = contacts.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
   const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
 
-  // ✅ Page title + localStorage — Navbar badge ke liye
   useEffect(() => {
     document.title = totalUnread > 0 ? `(${totalUnread}) Portál` : "Portál";
     localStorage.setItem("unreadCount", String(totalUnread));
@@ -104,7 +92,6 @@ function Chat() {
     };
   }, [totalUnread]);
 
-  // ✅ Browser notification permission
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
@@ -135,7 +122,7 @@ function Chat() {
     if (!contactToOpen || contactsLoading) return;
     const found = contacts.find((c) => String(c.id) === String(contactToOpen.id));
     openContact(found || contactToOpen);
-  }, [contactsLoading]); // eslint-disable-line
+  }, [contactsLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 3. Load message history ─────────────────────────────────────────────
   const loadHistory = useCallback(async (contact) => {
@@ -158,9 +145,9 @@ function Chat() {
     } finally {
       setHistoryLoading(false);
     }
-  }, [history]);
+  }, [history]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── 4. WebSocket — SIRF EK BAAR connect karo ───────────────────────────
+  // ── 4. WebSocket ────────────────────────────────────────────────────────
   useEffect(() => {
     connectSocket((msg) => {
       const contactId = msg.senderId;
@@ -184,17 +171,14 @@ function Chat() {
         String(activeContactRef.current.id) === String(contactId);
 
       if (!isCurrentChat) {
-        // ✅ Unread count badhao
         setUnread((prev) => ({
           ...prev,
           [contactId]: (prev[contactId] || 0) + 1,
         }));
 
-        // ✅ contactsRef use karo — stale closure problem fix
         const senderName =
           contactsRef.current.find((c) => String(c.id) === String(contactId))?.name || "Someone";
 
-        // ✅ Browser notification
         if ("Notification" in window && Notification.permission === "granted") {
           new Notification(`💬 ${senderName}`, {
             body: msg.text || msg.content || "New message",
@@ -206,12 +190,12 @@ function Chat() {
     });
 
     return () => disconnectSocket();
-  }, []); // ✅ [] — sirf ek baar, reconnect nahi hoga
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 5. Auto-scroll ──────────────────────────────────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs.length, typing]);
+  }, [msgs.length]);
 
   // ── 6. Send message ─────────────────────────────────────────────────────
   const handleSend = useCallback(() => {
@@ -481,7 +465,6 @@ function Chat() {
                     {!historyLoading && msgs.map((msg) => (
                       <Bubble key={msg.id} msg={msg} isNew={newMsgIds.has(msg.id)} />
                     ))}
-                    {typing && <TypingDots />}
                     <div ref={bottomRef} />
                   </div>
 
