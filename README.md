@@ -68,3 +68,94 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Job Portal — Tailwind CSS Version
+
+## File Structure
+
+```
+src/
+├── App.jsx
+├── index.css                        ← Tailwind directives + Google Fonts
+├── components/
+│   ├── Navbar.jsx
+│   ├── ResumeModal.jsx              ← Pops up when "Apply Now" is clicked
+│   └── ProtectedRoute.jsx
+└── pages/
+    ├── Login.jsx
+    ├── Register.jsx
+    ├── Jobs.jsx
+    ├── Dashboard.jsx
+    ├── AddJob.jsx
+    ├── EditJob.jsx
+    └── UploadResume.jsx
+
+tailwind.config.js                   ← Custom tokens (colors, fonts, animations)
+```
+
+## Setup
+
+### 1. Install Tailwind CSS (if not already)
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+### 2. Replace tailwind.config.js
+Use the provided `tailwind.config.js` — it adds custom color tokens and font families so you can use shorthand like `text-gold`, `bg-card`, `bg-navy`, etc.
+
+### 3. Replace your index.css
+Use the provided `index.css` — it includes the Google Fonts import and Tailwind directives.
+
+### 4. Import index.css in main.jsx
+```js
+import "./index.css";
+```
+
+### 5. Drop all component and page files into src/
+No other dependencies needed beyond what you already have.
+
+---
+
+## Key Design Details
+
+### Colors (defined in tailwind.config.js)
+| Token         | Value     | Usage                     |
+|---------------|-----------|---------------------------|
+| `navy`        | #0B1829   | Page background           |
+| `card`        | #112033   | Card / panel backgrounds  |
+| `navy3`       | #0E1C2D   | Input backgrounds         |
+| `border`      | #1E2E42   | All borders               |
+| `gold`        | #C9963A   | Primary accent / CTA      |
+| `gold-light`  | #E8B55A   | Hover state for gold      |
+| `cream`       | #F7F4EE   | Body text                 |
+| `muted`       | #7A8899   | Secondary text / labels   |
+| `green`       | #1A8C5A   | Success states            |
+| `green-light` | #4CC98A   | Success text              |
+
+### Fonts
+- **Playfair Display** — headings (apply via `font-serif` or inline `style`)
+- **DM Sans** — all body text (`font-sans`)
+
+### Login ↔ Register
+Both pages share the same two-panel layout. The tab group uses `<Link>` to cross-navigate. "Create one" / "Sign in" links also cross-link.
+
+### Resume Upload on Apply
+Clicking **Apply Now** opens `ResumeModal`. The user must attach a PDF/DOC/DOCX (≤5 MB) before submitting. On confirm: uploads resume then posts application. Button becomes **✓ Applied**.
+
+### No Logic Changes
+All service imports (`authService`, `jobService`, `api`, `utils/auth`) are identical to the original code.
