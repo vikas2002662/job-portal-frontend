@@ -3,7 +3,7 @@ import API from "../services/api";
 
 function UploadResume() {
   const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false); // ✅ used now
   const [success, setSuccess] = useState(false);
 
   const handleFile = (f) => {
@@ -43,8 +43,8 @@ function UploadResume() {
         onChange={(e) => handleFile(e.target.files[0])}
       />
 
-      <button onClick={handleUpload}>
-        Upload Resume
+      <button onClick={handleUpload} disabled={uploading}>
+        {uploading ? "Uploading..." : "Upload Resume"}
       </button>
 
       {success && <p>Uploaded Successfully</p>}
