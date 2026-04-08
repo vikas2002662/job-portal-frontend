@@ -50,12 +50,16 @@ function Dashboard() {
     }
   };
 
-  // ✅ VIEW RESUME — fixed: uses /resume/view/{userId} API instead of app.resumeUrl
-  const viewResume = (userId) => {
-    window.open(
-      `https://job-portal-backend-2-ictb.onrender.com/resume/view/${userId}`,
-      "_blank"
-    );
+  // ✅ FIXED: API call with JWT first → backend returns Cloudinary URL → window.open()
+  const viewResume = async (userId) => {
+    try {
+      const res = await API.get(`/resume/view/${userId}`);
+      console.log("Resume URL:", res.data); // debug
+      window.open(res.data, "_blank");
+    } catch (err) {
+      console.error("VIEW RESUME ERROR:", err);
+      alert("Cannot open resume");
+    }
   };
 
   const statusColor = (status) => {
@@ -189,7 +193,6 @@ function Dashboard() {
                           {app.status}
                         </span>
                       </p>
-                      {/* ✅ FIXED: uses viewResume(userId) instead of app.resumeUrl */}
                       {app.jobSeeker?.id && (
                         <button
                           onClick={() => viewResume(app.jobSeeker.id)}
