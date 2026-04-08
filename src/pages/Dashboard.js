@@ -43,11 +43,19 @@ function Dashboard() {
   const updateStatus = async (id, status) => {
     try {
       await API.put(`/applications/status/${id}?status=${status}`);
-      viewApplicants(selectedJob, selectedJobTitle); // refresh list
+      viewApplicants(selectedJob, selectedJobTitle);
     } catch (err) {
       console.error(err);
       alert("Failed to update status");
     }
+  };
+
+  // ✅ VIEW RESUME — fixed: uses /resume/view/{userId} API instead of app.resumeUrl
+  const viewResume = (userId) => {
+    window.open(
+      `https://job-portal-backend-2-ictb.onrender.com/resume/view/${userId}`,
+      "_blank"
+    );
   };
 
   const statusColor = (status) => {
@@ -119,7 +127,6 @@ function Dashboard() {
                 </p>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {/* ✅ UPDATED: navigates to /applicants/:id page */}
                 <button
                   onClick={() => navigate(`/applicants/${job.id}`)}
                   className="border border-[#1E88E5]/40 text-[#64B5F6] text-sm px-4 py-1.5 rounded-lg hover:bg-[#1E88E5]/10 transition-colors"
@@ -144,7 +151,7 @@ function Dashboard() {
         </div>
       )}
 
-      {/* ✅ Applicants Panel — kept intact, still works if used programmatically */}
+      {/* Applicants Panel */}
       {selectedJob && (
         <div className="mt-10">
           <div className="flex items-center justify-between mb-4">
@@ -182,15 +189,14 @@ function Dashboard() {
                           {app.status}
                         </span>
                       </p>
-                      {app.resumeUrl && (
-                        <a
-                          href={app.resumeUrl}
-                          target="_blank"
-                          rel="noreferrer"
+                      {/* ✅ FIXED: uses viewResume(userId) instead of app.resumeUrl */}
+                      {app.jobSeeker?.id && (
+                        <button
+                          onClick={() => viewResume(app.jobSeeker.id)}
                           className="inline-block mt-1 text-[#64B5F6] text-sm hover:underline"
                         >
                           📄 View Resume
-                        </a>
+                        </button>
                       )}
                     </div>
                     <div className="flex gap-2 flex-wrap">
