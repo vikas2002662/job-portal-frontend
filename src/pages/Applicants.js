@@ -29,13 +29,20 @@ function Applicants() {
     }
   };
 
-  const viewResume = (userId) => {
-    // ⚠️ Production fix (localhost → deployed backend)
-    window.open(
-      `https://job-portal-backend-2-ictb.onrender.com/resume/view/${userId}`,
-      "_blank"
-    );
-  };
+ const viewResume = async (userId) => {
+  try {
+    const res = await API.get(`/resume/view/${userId}`);
+
+    console.log("Resume URL:", res.data); // DEBUG
+
+    // ✅ Cloudinary URL open होगा
+    window.open(res.data, "_blank");
+
+  } catch (err) {
+    console.error("VIEW RESUME ERROR:", err);
+    alert("Cannot open resume");
+  }
+};
 
   const updateStatus = async (appId, status) => {
     try {
